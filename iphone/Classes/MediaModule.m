@@ -375,9 +375,10 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
   if (systemMusicPlayer == nil) {
     if (![NSThread isMainThread]) {
       __block id result;
-      TiThreadPerformOnMainThread(^{
-        result = [self systemMusicPlayer];
-      },
+      TiThreadPerformOnMainThread(
+          ^{
+            result = [self systemMusicPlayer];
+          },
           YES);
       return result;
     }
@@ -391,9 +392,10 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
   if (appMusicPlayer == nil) {
     if (![NSThread isMainThread]) {
       __block id result;
-      TiThreadPerformOnMainThread(^{
-        result = [self appMusicPlayer];
-      },
+      TiThreadPerformOnMainThread(
+          ^{
+            result = [self appMusicPlayer];
+          },
           YES);
       return appMusicPlayer;
     }
@@ -666,15 +668,16 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
 {
   ENSURE_SINGLE_ARG(args, KrollCallback);
   KrollCallback *callback = args;
-  TiThreadPerformOnMainThread(^() {
-    [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
-      KrollEvent *invocationEvent = [[KrollEvent alloc] initWithCallback:callback
-                                                             eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:nil]
-                                                              thisObject:self];
-      [[callback context] enqueue:invocationEvent];
-      RELEASE_TO_NIL(invocationEvent);
-    }];
-  },
+  TiThreadPerformOnMainThread(
+      ^() {
+        [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
+          KrollEvent *invocationEvent = [[KrollEvent alloc] initWithCallback:callback
+                                                                 eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:nil]
+                                                                  thisObject:self];
+          [[callback context] enqueue:invocationEvent];
+          RELEASE_TO_NIL(invocationEvent);
+        }];
+      },
       NO);
 }
 #endif
@@ -940,9 +943,10 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
 {
   ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
   if (![NSThread isMainThread]) {
-    TiThreadPerformOnMainThread(^{
-      [self showCamera:args];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self showCamera:args];
+        },
         NO);
     return;
   }
@@ -1057,17 +1061,18 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
 {
   ENSURE_SINGLE_ARG(arg, KrollCallback);
   KrollCallback *callback = arg;
-  TiThreadPerformOnMainThread(^() {
-    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo
-                             completionHandler:^(BOOL granted) {
-                               NSString *errorMessage = granted ? nil : @"The user denied access to use the camera.";
-                               KrollEvent *invocationEvent = [[KrollEvent alloc] initWithCallback:callback
-                                                                                      eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:errorMessage]
-                                                                                       thisObject:self];
-                               [[callback context] enqueue:invocationEvent];
-                               RELEASE_TO_NIL(invocationEvent);
-                             }];
-  },
+  TiThreadPerformOnMainThread(
+      ^() {
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo
+                                 completionHandler:^(BOOL granted) {
+                                   NSString *errorMessage = granted ? nil : @"The user denied access to use the camera.";
+                                   KrollEvent *invocationEvent = [[KrollEvent alloc] initWithCallback:callback
+                                                                                          eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:errorMessage]
+                                                                                           thisObject:self];
+                                   [[callback context] enqueue:invocationEvent];
+                                   RELEASE_TO_NIL(invocationEvent);
+                                 }];
+      },
       NO);
 }
 #endif
@@ -1091,16 +1096,17 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
   ENSURE_SINGLE_ARG(arg, KrollCallback);
   KrollCallback *callback = arg;
 
-  TiThreadPerformOnMainThread(^() {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-      BOOL granted = (status == PHAuthorizationStatusAuthorized);
-      NSString *errorMessage = granted ? @"" : @"The user denied access to use the photo gallery.";
-      KrollEvent *invocationEvent = [[[KrollEvent alloc] initWithCallback:callback
-                                                              eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:errorMessage]
-                                                               thisObject:self] autorelease];
-      [[callback context] enqueue:invocationEvent];
-    }];
-  },
+  TiThreadPerformOnMainThread(
+      ^() {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          BOOL granted = (status == PHAuthorizationStatusAuthorized);
+          NSString *errorMessage = granted ? @"" : @"The user denied access to use the photo gallery.";
+          KrollEvent *invocationEvent = [[[KrollEvent alloc] initWithCallback:callback
+                                                                  eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:errorMessage]
+                                                                   thisObject:self] autorelease];
+          [[callback context] enqueue:invocationEvent];
+        }];
+      },
       YES);
 }
 #endif
@@ -1238,16 +1244,17 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
   KrollCallback *callback = args;
 
   if ([TiUtils isIOSVersionOrGreater:@"9.3"]) {
-    TiThreadPerformOnMainThread(^() {
-      [MPMediaLibrary requestAuthorization:^(MPMediaLibraryAuthorizationStatus status) {
-        BOOL granted = status == MPMediaLibraryAuthorizationStatusAuthorized;
-        KrollEvent *invocationEvent = [[KrollEvent alloc] initWithCallback:callback
-                                                               eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:nil]
-                                                                thisObject:self];
-        [[callback context] enqueue:invocationEvent];
-        RELEASE_TO_NIL(invocationEvent);
-      }];
-    },
+    TiThreadPerformOnMainThread(
+        ^() {
+          [MPMediaLibrary requestAuthorization:^(MPMediaLibraryAuthorizationStatus status) {
+            BOOL granted = status == MPMediaLibraryAuthorizationStatusAuthorized;
+            KrollEvent *invocationEvent = [[KrollEvent alloc] initWithCallback:callback
+                                                                   eventObject:[TiUtils dictionaryWithCode:(granted ? 0 : 1) message:nil]
+                                                                    thisObject:self];
+            [[callback context] enqueue:invocationEvent];
+            RELEASE_TO_NIL(invocationEvent);
+          }];
+        },
         NO);
   } else {
     NSDictionary *propertiesDict = [TiUtils dictionaryWithCode:0 message:nil];
@@ -1507,9 +1514,10 @@ MAKE_SYSTEM_PROP(VIDEO_REPEAT_MODE_ONE, VideoRepeatModeOne);
     self.popoverView = popoverViewProxy;
     arrowDirection = [TiUtils intValue:@"arrowDirection" properties:args def:UIPopoverArrowDirectionAny];
 
-    TiThreadPerformOnMainThread(^{
-      [self updatePopoverNow:picker_];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self updatePopoverNow:picker_];
+        },
         YES);
   }
 }

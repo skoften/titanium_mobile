@@ -229,9 +229,10 @@
 #ifndef TI_USE_AUTOLAYOUT
   if (!needsHandleContentSize) {
     needsHandleContentSize = YES;
-    TiThreadPerformOnMainThread(^{
-      [self handleContentSize];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self handleContentSize];
+        },
         NO);
   }
 #endif

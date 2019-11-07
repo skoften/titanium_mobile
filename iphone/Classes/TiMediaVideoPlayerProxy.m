@@ -232,9 +232,10 @@ NSArray *moviePlayerKeys = nil;
   [loadProperties setValue:value forKey:@"scalingMode"];
 
   if (movie != nil) {
-    TiThreadPerformOnMainThread(^{
-      [self updateScalingMode:@"scalingMode"];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self updateScalingMode:@"scalingMode"];
+        },
         NO);
   }
 }
@@ -320,9 +321,10 @@ NSArray *moviePlayerKeys = nil;
   }
 
   if (restart) {
-    TiThreadPerformOnMainThread(^{
-      [self play:nil];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self play:nil];
+        },
         NO);
   }
 }
@@ -374,9 +376,10 @@ NSArray *moviePlayerKeys = nil;
 {
   if (movie != nil) {
     __block float volume = 1.0;
-    TiThreadPerformOnMainThread(^{
-      volume = [[movie player] volume];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          volume = [[movie player] volume];
+        },
         YES);
 
     return NUMFLOAT(volume);
@@ -389,9 +392,10 @@ NSArray *moviePlayerKeys = nil;
 {
   float volume = [TiUtils floatValue:newVolume def:-1.0];
   volume = MAX(0.0, MIN(volume, 1.0));
-  TiThreadPerformOnMainThread(^{
-    [[movie player] setVolume:volume];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [[movie player] setVolume:volume];
+      },
       YES);
 }
 
@@ -438,9 +442,10 @@ NSArray *moviePlayerKeys = nil;
                                                [event setObject:NUMDOUBLE(actualTime.value / actualTime.timescale) forKey:@"time"];
                                              }
 
-                                             TiThreadPerformOnMainThread(^{
-                                               [self _fireEventToListener:@"thumbnail" withObject:event listener:thumbnailCallback thisObject:nil];
-                                             },
+                                             TiThreadPerformOnMainThread(
+                                                 ^{
+                                                   [self _fireEventToListener:@"thumbnail" withObject:event listener:thumbnailCallback thisObject:nil];
+                                                 },
                                                  YES);
 
                                              if (--callbackRequestCount <= 0) {
@@ -483,10 +488,11 @@ NSArray *moviePlayerKeys = nil;
 
 - (void)cancelAllThumbnailImageRequests:(id)value
 {
-  TiThreadPerformOnMainThread(^{
-    AVAssetImageGenerator *imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[[[movie player] currentItem] asset]];
-    [imageGenerator cancelAllCGImageGeneration];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        AVAssetImageGenerator *imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[[[movie player] currentItem] asset]];
+        [imageGenerator cancelAllCGImageGeneration];
+      },
       NO);
 }
 
@@ -546,9 +552,10 @@ NSArray *moviePlayerKeys = nil;
   backgroundColor = [[TiUtils colorValue:color] retain];
 
   if (movie != nil) {
-    TiThreadPerformOnMainThread(^{
-      [[movie view] setBackgroundColor:[backgroundColor _color]];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [[movie view] setBackgroundColor:[backgroundColor _color]];
+        },
         NO);
     return;
   } else {

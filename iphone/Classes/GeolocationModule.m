@@ -60,10 +60,11 @@ extern NSString *const TI_APPLICATION_GUID;
   [req setMethod:@"GET"];
   // Place it in the main thread since we're not using a queue and yet we need the
   // delegate methods to be called...
-  TiThreadPerformOnMainThread(^{
-    [req send];
-    [req autorelease];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [req send];
+        [req autorelease];
+      },
       NO);
 }
 
@@ -422,9 +423,10 @@ extern NSString *const TI_APPLICATION_GUID;
   }
 
   if (startStop) {
-    TiThreadPerformOnMainThread(^{
-      [self startStopLocationManagerIfNeeded];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self startStopLocationManagerIfNeeded];
+        },
         NO);
   }
 }
@@ -447,9 +449,10 @@ extern NSString *const TI_APPLICATION_GUID;
   }
 
   if (check && ![self _hasListeners:@"heading"] && ![self _hasListeners:@"location"]) {
-    TiThreadPerformOnMainThread(^{
-      [self startStopLocationManagerIfNeeded];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [self startStopLocationManagerIfNeeded];
+        },
         YES);
     [self shutdownLocationManager];
     trackingLocation = NO;
@@ -657,9 +660,10 @@ GETTER_IMPL(CLAuthorizationStatus, locationServicesAuthorization, LocationServic
         trackingLocation = NO;
         trackSignificantLocationChange = newval;
         [lock unlock];
-        TiThreadPerformOnMainThread(^{
-          [self startStopLocationManagerIfNeeded];
-        },
+        TiThreadPerformOnMainThread(
+            ^{
+              [self startStopLocationManagerIfNeeded];
+            },
             NO);
         return;
       }
@@ -682,9 +686,10 @@ READWRITE_IMPL(BOOL, trackSignificantLocationChange, TrackSignificantLocationCha
 - (void)setActivityType:(CLActivityType)value
 {
   activityType = value;
-  TiThreadPerformOnMainThread(^{
-    [locationManager setActivityType:activityType];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [locationManager setActivityType:activityType];
+      },
       NO);
 }
 
@@ -700,9 +705,10 @@ READWRITE_IMPL(CLActivityType, activityType, ActivityType);
 - (void)setPauseLocationUpdateAutomatically:(BOOL)value
 {
   pauseLocationUpdateAutomatically = value;
-  TiThreadPerformOnMainThread(^{
-    [locationManager setPausesLocationUpdatesAutomatically:pauseLocationUpdateAutomatically];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [locationManager setPausesLocationUpdatesAutomatically:pauseLocationUpdateAutomatically];
+      },
       NO);
 }
 
@@ -716,9 +722,10 @@ READWRITE_IMPL(BOOL, pauseLocationUpdateAutomatically, PauseLocationUpdateAutoma
   trackingLocation = NO;
   [lock unlock];
   // must be on UI thread
-  TiThreadPerformOnMainThread(^{
-    [self startStopLocationManagerIfNeeded];
-  },
+  TiThreadPerformOnMainThread(
+      ^{
+        [self startStopLocationManagerIfNeeded];
+      },
       NO);
 }
 
@@ -805,9 +812,10 @@ MAKE_SYSTEM_PROP(ACTIVITYTYPE_OTHER_NAVIGATION, CLActivityTypeOtherNavigation);
       if (currentPermissionLevel == kCLAuthorizationStatusAuthorizedAlways) {
         errorMessage = @"Cannot change already granted permission from AUTHORIZATION_ALWAYS to the lower permission-level AUTHORIZATION_WHEN_IN_USE";
       } else {
-        TiThreadPerformOnMainThread(^{
-          [[self locationPermissionManager] requestWhenInUseAuthorization];
-        },
+        TiThreadPerformOnMainThread(
+            ^{
+              [[self locationPermissionManager] requestWhenInUseAuthorization];
+            },
             NO);
       }
     } else {
@@ -817,9 +825,10 @@ MAKE_SYSTEM_PROP(ACTIVITYTYPE_OTHER_NAVIGATION, CLActivityTypeOtherNavigation);
   }
   if (requestedAuthorizationStatus == kCLAuthorizationStatusAuthorizedAlways) {
     if ([GeolocationModule hasAlwaysPermissionKeys]) {
-      TiThreadPerformOnMainThread(^{
-        [[self locationPermissionManager] requestAlwaysAuthorization];
-      },
+      TiThreadPerformOnMainThread(
+          ^{
+            [[self locationPermissionManager] requestAlwaysAuthorization];
+          },
           NO);
     } else if ([TiUtils isIOSVersionOrGreater:@"11.0"]) {
       errorMessage = [[NSString alloc] initWithFormat:
@@ -1044,11 +1053,12 @@ READWRITE_IMPL(BOOL, showCalibration, ShowCalibration);
       errorStr = @"The requested permissions do not match the selected permission (the user likely declined AUTHORIZATION_ALWAYS permissions) in iOS 11+";
     }
 
-    TiThreadPerformOnMainThread(^{
-      NSMutableDictionary *propertiesDict = [TiUtils dictionaryWithCode:code message:errorStr];
-      [propertiesDict setObject:NUMINT([CLLocationManager authorizationStatus]) forKey:@"authorizationStatus"];
-      [[authorizationCallback value] callWithArguments:@[ propertiesDict ]];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          NSMutableDictionary *propertiesDict = [TiUtils dictionaryWithCode:code message:errorStr];
+          [propertiesDict setObject:NUMINT([CLLocationManager authorizationStatus]) forKey:@"authorizationStatus"];
+          [[authorizationCallback value] callWithArguments:@[ propertiesDict ]];
+        },
         YES);
     [[authorizationCallback value].context.virtualMachine removeManagedReference:authorizationCallback withOwner:self];
     RELEASE_TO_NIL(authorizationCallback);

@@ -109,23 +109,24 @@
       }
     }];
   } else {
-    TiThreadPerformOnMainThread(^{
-      if (args == nil || [args count] == 0) {
-        [[UIApplication sharedApplication] cancelAllLocalNotifications];
-        return;
-      }
-
-      for (UILocalNotification *scheduledNotification in UIApplication.sharedApplication.scheduledLocalNotifications) {
-        for (id notification in args) {
-          ENSURE_TYPE(notification, NSDictionary);
-
-          if ([notification[@"userInfo"][@"id"] isEqual:scheduledNotification.userInfo[@"id"]]) {
-            [UIApplication.sharedApplication cancelLocalNotification:scheduledNotification];
-            break;
+    TiThreadPerformOnMainThread(
+        ^{
+          if (args == nil || [args count] == 0) {
+            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+            return;
           }
-        }
-      }
-    },
+
+          for (UILocalNotification *scheduledNotification in UIApplication.sharedApplication.scheduledLocalNotifications) {
+            for (id notification in args) {
+              ENSURE_TYPE(notification, NSDictionary);
+
+              if ([notification[@"userInfo"][@"id"] isEqual:scheduledNotification.userInfo[@"id"]]) {
+                [UIApplication.sharedApplication cancelLocalNotification:scheduledNotification];
+                break;
+              }
+            }
+          }
+        },
         NO);
   }
 }
@@ -195,15 +196,16 @@
       [invocationArray release];
     }];
   } else {
-    TiThreadPerformOnMainThread(^{
-      UIUserNotificationSettings *settings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+    TiThreadPerformOnMainThread(
+        ^{
+          UIUserNotificationSettings *settings = [[UIApplication sharedApplication] currentUserNotificationSettings];
 
-      NSDictionary *propertiesDict = [self formatUserNotificationSettings:settings];
-      NSArray *invocationArray = [[NSArray alloc] initWithObjects:&propertiesDict count:1];
+          NSDictionary *propertiesDict = [self formatUserNotificationSettings:settings];
+          NSArray *invocationArray = [[NSArray alloc] initWithObjects:&propertiesDict count:1];
 
-      [callback call:invocationArray thisObject:self];
-      [invocationArray release];
-    },
+          [callback call:invocationArray thisObject:self];
+          [invocationArray release];
+        },
         YES);
   }
 }
@@ -251,9 +253,10 @@
 {
   if (![NSThread isMainThread]) {
     __block NSDictionary *result = nil;
-    TiThreadPerformOnMainThread(^{
-      result = [[self formatUserNotificationSettings:notificationSettings] retain];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          result = [[self formatUserNotificationSettings:notificationSettings] retain];
+        },
         YES);
     return [result autorelease];
   }

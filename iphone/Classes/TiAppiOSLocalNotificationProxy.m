@@ -38,10 +38,11 @@
     [[UNUserNotificationCenter currentNotificationCenter] removePendingNotificationRequestsWithIdentifiers:@[ [TiUtils stringValue:identifier] ]];
   } else {
     UILocalNotification *cancelledNotification = [self.notification retain];
-    TiThreadPerformOnMainThread(^{
-      [[UIApplication sharedApplication] cancelLocalNotification:cancelledNotification];
-      [cancelledNotification release];
-    },
+    TiThreadPerformOnMainThread(
+        ^{
+          [[UIApplication sharedApplication] cancelLocalNotification:cancelledNotification];
+          [cancelledNotification release];
+        },
         NO);
   }
 }
